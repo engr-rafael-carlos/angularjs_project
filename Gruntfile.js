@@ -1,5 +1,6 @@
 module.exports = function(grunt){
 	grunt.loadNpmTasks('grunt-wiredep');
+	grunt.loadNpmTasks('grunt-contrib-watch');
 
 	grunt.initConfig({
 		wiredep: {
@@ -13,5 +14,5 @@ module.exports = function(grunt){
 		}
 	});
 
-	grunt.registerTask('default', ['wiredep', 'watch']);
+	grunt.registerTask('default', ['wiredep']);
 };

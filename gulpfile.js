@@ -1,26 +1,29 @@
 // *** Plugins ***
-var gulp       = require("gulp"),
-	sass       = require("gulp-sass"),
-	concat     = require("gulp-concat"),
-	watch      = require("gulp-watch"),
-	plumber    = require("gulp-plumber"),
-	minify_css = require("gulp-minify-css"),
-	uglify     = require("gulp-uglify"),	
-	sourcemaps = require("gulp-sourcemaps"),
-    notify     = require("gulp-notify"),
-    prefix     = require("gulp-autoprefixer"),
-    imagemin   = require("gulp-imagemin"),
-    jshint     = require("gulp-jshint"),
-    pngquant   = require("imagemin-pngquant"),
-    mozjpeg    = require("imagemin-mozjpeg"),
+var gulp        = require("gulp"),
+	sass        = require("gulp-sass"),
+	concat      = require("gulp-concat"),
+	watch       = require("gulp-watch"),
+	plumber     = require("gulp-plumber"),
+	minify_css  = require("gulp-minify-css"),
+	uglify      = require("gulp-uglify"),	
+	sourcemaps  = require("gulp-sourcemaps"),
+    notify      = require("gulp-notify"),
+    prefix      = require("gulp-autoprefixer"),
+    imagemin    = require("gulp-imagemin"),
+    jshint      = require("gulp-jshint"),
+    pngquant    = require("imagemin-pngquant"),
+    mozjpeg     = require("imagemin-mozjpeg"),
     browsersync = require("browser-sync"),
     wiredep     = require("wiredep").stream;
+
+
 
 // *** Destination Folder ***
 var src = {
 	sass: "src/sass/**/*.scss",
 	  js: "src/js/**/*.js",
-	 img: "src/img/*"
+	 img: "src/img/*",
+	html: "scr/**/*.html",
 }
 
 var dist = {
@@ -85,17 +88,19 @@ gulp.task('img', function(){
 		.pipe(gulp.dest(dist.img));
 });
 
+// *** Bower Components ***
+gulp.task('bower', function () {
+  gulp.src(['bower_components/**/*'])
+    .pipe(gulp.dest('dist/bower_components'));
+});
+
 // *** Inject Bower Components ***
-gulp.task('bower', function(){
-	return gulp.src('./dist/index.html')
-		.pipe(wiredep({
-			optional: {
-				directory: 'bower_components',
-				bowerJson: 'bower.json'
-			},
-			goes: ''
-		}))
-		.pipe(gulp.dest('./dist'));
+gulp.task('inject', function () {
+  gulp.src(['dist/index.html'])
+    .pipe(wiredep({
+		directory: "bower_components"
+    }))
+    .pipe(gulp.dest('./dist'));
 });
 
 // *** Watch ***
@@ -106,8 +111,9 @@ gulp.task('watch', function(){
 	gulp.watch(src.js, ['js']);
 	gulp.watch(src.sass, ['sass']);
 	gulp.watch(src.img, ['img']);
+	gulp.watch('bower.json', ['bower']);
 	gulp.watch(dist.html).on('change', browsersync.reload);
 });
 
 // *** Default ***
-gulp.task('default', ['watch', 'sass', 'js', 'img', 'bower']);
+gulp.task('default', ['watch', 'sass', 'js', 'img', 'bower', 'inject']);
